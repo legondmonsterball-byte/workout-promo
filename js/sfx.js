@@ -29,7 +29,7 @@ export const sfx = {
   whoosh() { burst({ f0: 180, f1: 2600, q: .6, dur: .9, vol: .35 }); tone(60, .9, .25, 'sine', .6, 38) },
   thud() { tone(90, .35, .35, 'sine', 0, 45); burst({ f0: 400, f1: 120, q: .7, dur: .25, vol: .2, type: 'lowpass' }) },
   tick() { tone(1400, .05, .04, 'square') },
-  charge() { tone(140, .8, .12, 'sawtooth', 0, 620); tone(280, .8, .06, 'sine', 0, 1240); burst({ f0: 300, f1: 4000, q: 2, dur: .8, vol: .12 }) },
+  charge(d = 3) { tone(90, d, .1, 'sawtooth', 0, 620); tone(180, d, .05, 'sine', 0, 1240); burst({ f0: 200, f1: 5000, q: 2, dur: d, vol: .14 }) },
   pop() { tone(520, .18, .18, 'triangle', 0, 1100); tone(1200, .25, .08, 'sine', .06, 1800) },
 };
 

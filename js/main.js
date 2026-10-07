@@ -1,6 +1,6 @@
 // 운동 기록 앱 홍보 사이트: E → 3D 플립북 → 핸드폰 속 앱 → Do you wanna try?
-import { sfx, music } from './sfx.js?v=1791357913';
-import { makeFrames } from './figure.js?v=1791357913';
+import { sfx, music } from './sfx.js?v=1791358013';
+import { makeFrames } from './figure.js?v=1791358013';
 
 const gsap = window.gsap;
 const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
@@ -62,7 +62,7 @@ const fontsReady = Promise.all([
   document.fonts.load('900 100px Archivo'), document.fonts.load('700 40px Caveat'),
   document.fonts.load('40px "Nanum Pen Script"', '눌러봐 기록'), document.fonts.load('900 40px "Pretendard Variable"', '기록'),
 ]).catch(() => { });
-const bookMod = fontsReady.then(() => import('./book.js?v=1791357913'));
+const bookMod = fontsReady.then(() => import('./book.js?v=1791358013'));
 bookMod.catch(() => { });
 
 // ───────── 1. 첫 화면 ─────────
@@ -113,20 +113,24 @@ addEventListener('keydown', e => {
 
 async function go() {
   if (stage !== 'hero' || !introDone) return;
-  stage = 'toBook'; startAudio(); sfx.charge();
+  stage = 'toBook'; startAudio(); sfx.charge(3);
   const e = chars[0], others = chars.slice(1);
   gsap.killTweensOf(chars); $('#word').style.overflow = 'visible';
   e.style.setProperty('--wg', 900); e.style.setProperty('--wd', 100);
   gsap.set(e, { transformOrigin: '20% 55%' });
-  // E 안이 아래부터 차오르며 꽉 채워지고 → 그대로 화면을 덮을 만큼 커진다
-  const fill = { v: parseFloat(e.style.getPropertyValue('--fill')) || 0 };
+  // E 안이 3초 동안 아래부터 차오르며 점점 세게 흔들리고 → 꽉 차면 나머지 글자가 떨어지고 E가 화면을 덮는다
+  const FILL = 3, fill = { v: parseFloat(e.style.getPropertyValue('--fill')) || 0 }, start = fill.v;
   const tl = gsap.timeline();
-  tl.to('.lede, .hint, .badge, .marq, .meta', { opacity: 0, duration: .35 }, 0)
-    .to(others, { y: () => innerHeight * gsap.utils.random(.6, 1.1), x: () => gsap.utils.random(-80, 80), rotation: () => gsap.utils.random(-80, 80), opacity: 0, duration: 1, ease: 'power3.in', stagger: { each: .04, from: 'end' } }, 0)
-    .to(fill, { v: 100, duration: .8, ease: 'power2.inOut', onUpdate: () => e.style.setProperty('--fill', fill.v + '%') }, 0)
-    .to(e, { scale: 1.12, duration: .8, ease: 'power2.out' }, 0)
-    .add(() => { e.style.color = 'var(--cyan)'; e.style.background = 'none'; sfx.whoosh() }, .8)
-    .to(e, { scale: 90, duration: 1.1, ease: 'expo.in' }, .85);
+  tl.to('.lede, .hint, .badge, .marq, .meta', { opacity: 0, duration: .5 }, 0)
+    .to(fill, { v: 100, duration: FILL, ease: 'power1.in', onUpdate() {
+      e.style.setProperty('--fill', fill.v + '%');
+      const p = (fill.v - start) / (100 - start), a = 1 + 9 * p * p, R = gsap.utils.random;
+      gsap.set(e, { x: R(-a, a), y: R(-a, a), rotation: R(-a, a) * .25, scale: 1 + .1 * p });
+      others.forEach(o => gsap.set(o, { x: R(-1, 1) * p * 2, y: R(-1, 1) * p * 2 }));
+    } }, 0)
+    .add(() => { gsap.set(e, { x: 0, y: 0, rotation: 0 }); e.style.color = 'var(--cyan)'; e.style.background = 'none'; sfx.whoosh() }, FILL)
+    .to(others, { y: () => innerHeight * gsap.utils.random(.6, 1.1), x: () => gsap.utils.random(-80, 80), rotation: () => gsap.utils.random(-80, 80), opacity: 0, duration: 1, ease: 'power3.in', stagger: { each: .04, from: 'end' } }, FILL)
+    .to(e, { scale: 90, duration: 1.1, ease: 'expo.in' }, FILL + .15);
   const [mod] = await Promise.all([bookMod, tl.then()]);
   showBook(mod);
 }
@@ -250,7 +254,7 @@ async function toFinale() {
   tl.to('#story', { opacity: 0, y: '-=40', duration: .4 }, 0)
     .to('#device', { scale: .85, y: -40, opacity: 0, duration: .7, ease: 'power3.in' }, 0)
     .to('.ph-copy, .ph-steps, #bgword', { opacity: 0, y: -30, duration: .6, ease: 'power3.in', stagger: .05 }, 0);
-  const [mod] = await Promise.all([import('./liquid.js?v=1791357913'), tl.then()]);
+  const [mod] = await Promise.all([import('./liquid.js?v=1791358013'), tl.then()]);
   $('#phone').classList.remove('on'); stage = 'finale';
   $('#finale').classList.add('on');
   liquid = mod.createLiquid($('#liq'));
