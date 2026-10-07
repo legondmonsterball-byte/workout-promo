@@ -2,51 +2,44 @@
 import * as THREE from 'three';
 
 const V = `varying vec2 vUv;void main(){vUv=uv;gl_Position=vec4(position.xy,0.,1.);}`;
-// 물: R = 지금 흐르는 물(빠르게 아래로 떨어지며 옆으로 살짝 퍼짐), G = 젖은 정도(물이 지나간 자리에 한동안 남음)
+// 액체 양: 두꺼운 곳은 아래로 흘러내리고(줄마다 속도 다름), 마우스가 지나간 곳에 새로 붓는다
 const SIM = `
-uniform sampler2D uPrev;uniform vec2 uMouse,uLast,uTexel;uniform float uForce,uAspect,uRadius,uTime,uSheet,uSheetY;varying vec2 vUv;
+uniform sampler2D uPrev;uniform vec2 uMouse,uLast,uTexel;uniform float uForce,uAspect,uRadius;varying vec2 vUv;
 float h1(float n){return fract(sin(n*12.9898)*43758.5453);}
 float vn(float x){float i=floor(x),f=fract(x);f=f*f*(3.-2.*f);return mix(h1(i),h1(i+1.),f);}
 float seg(vec2 p,vec2 a,vec2 b){vec2 pa=p-a,ba=b-a;float t=clamp(dot(pa,ba)/max(dot(ba,ba),1e-8),0.,1.);return length(pa-ba*t);}
 void main(){
-  vec2 px=uTexel;
-  float col=vn(vUv.x*48.+uTime*.4)*.6+vn(vUv.x*11.-uTime*.2)*.4;
-  float sp=px.y*(4.+8.*col);
-  float wob=(vn(vUv.y*18.-uTime*4.)-.5)*px.x*3.;
-  vec4 here=texture2D(uPrev,vUv);
-  float up=texture2D(uPrev,vUv+vec2(wob,sp)).r;
-  float ul=texture2D(uPrev,vUv+vec2(wob-px.x*2.5,sp)).r,ur=texture2D(uPrev,vUv+vec2(wob+px.x*2.5,sp)).r;
-  float w=(up*.62+(ul+ur)*.19)*.988;
-  w=max(w,here.r*.5);
+  float col=vn(vUv.x*70.)*.75+vn(vUv.x*17.+3.)*.25;
+  float sp=uTexel.y*(1.2+5.5*col*col);
+  float here=texture2D(uPrev,vUv).r;
+  float up=texture2D(uPrev,vUv+vec2(0.,sp)).r;
+  float l=texture2D(uPrev,vUv-vec2(uTexel.x,0.)).r,r=texture2D(uPrev,vUv+vec2(uTexel.x,0.)).r;
+  float v=max(here*.955,up*smoothstep(.04,.45,up)*.992);
+  v=mix(v,(l+r)*.5,.08)-.0025;
   vec2 p=vec2(vUv.x*uAspect,vUv.y),m=vec2(uMouse.x*uAspect,uMouse.y),lm=vec2(uLast.x*uAspect,uLast.y);
   float d=seg(p,lm,m);
-  w+=uForce*exp(-d*d/(uRadius*uRadius));
-  float sy=vUv.y-uSheetY;
-  w+=uSheet*exp(-sy*sy/.0003)*(.55+.45*vn(vUv.x*90.+uTime*6.));
-  w=clamp(w,0.,1.2);
-  float wet=max(here.g*.994-.0006,smoothstep(.04,.4,w));
-  gl_FragColor=vec4(w,wet,0.,1.);
+  v+=uForce*exp(-d*d/(uRadius*uRadius));
+  gl_FragColor=vec4(clamp(v,0.,1.4),0.,0.,1.);
 }`;
-// 화면: 물은 투명하게 굴절·반짝임만, 물에 젖은 글자는 시안~라임으로 밝아진다
+// 화면: 액체 표면 반짝임 + 액체에 닿은 글자는 시안~라임으로 빛난다
 const SHOW = `
 uniform sampler2D uTrail,uText;uniform vec2 uTexel;uniform float uTime;uniform vec3 uC1,uC2;varying vec2 vUv;
 void main(){
-  vec4 tr=texture2D(uTrail,vUv);float w=tr.r,wet=tr.g;
+  float t=texture2D(uTrail,vUv).r;
   vec2 e=uTexel*1.5;
   vec2 g=vec2(texture2D(uTrail,vUv+vec2(e.x,0.)).r-texture2D(uTrail,vUv-vec2(e.x,0.)).r,texture2D(uTrail,vUv+vec2(0.,e.y)).r-texture2D(uTrail,vUv-vec2(0.,e.y)).r);
-  float water=smoothstep(.02,.4,w);
-  vec2 tuv=vUv-g*.06;
+  float liq=smoothstep(.12,.45,t);
+  vec2 tuv=vUv-g*.03;
   float a=texture2D(uText,tuv).a,glow=texture2D(uText,tuv,4.).a;
   float k=clamp(.5+.5*sin(uTime*.5+vUv.x*3.+vUv.y*2.),0.,1.);
   vec3 lc=mix(uC2,uC1,k);
-  vec3 n=normalize(vec3(-g*10.,1.));
-  float spec=pow(max(dot(n,normalize(vec3(-.45,.6,.65))),0.),40.);
-  float lit=smoothstep(.05,.7,wet);
+  vec3 n=normalize(vec3(-g*7.,1.));
+  float spec=pow(max(dot(n,normalize(vec3(-.45,.6,.65))),0.),30.);
   vec3 col=vec3(.027,.035,.043);
-  col+=vec3(.55,.85,1.)*water*.11+spec*water*1.3;
-  col+=lc*glow*lit*.42;
+  col+=lc*liq*.07+spec*smoothstep(.02,.3,t)*.55;
+  col+=lc*glow*liq*.5;
   vec3 dim=vec3(.17,.19,.21);
-  col=mix(col,mix(dim,lc*(1.+.25*water)+spec*.6,lit),a);
+  col=mix(col,mix(dim,lc*1.1+spec*.5,liq),a);
   gl_FragColor=vec4(col,1.);
 }`;
 
@@ -70,7 +63,7 @@ export function createLiquid(canvas) {
   scene.add(quad);
   const simMat = new THREE.ShaderMaterial({ vertexShader: V, fragmentShader: SIM, uniforms: {
     uPrev: { value: null }, uMouse: { value: new THREE.Vector2(-1, -1) }, uLast: { value: new THREE.Vector2(-1, -1) },
-    uTexel: { value: new THREE.Vector2() }, uForce: { value: 0 }, uAspect: { value: 1 }, uRadius: { value: .045 }, uTime: { value: 0 }, uSheet: { value: 0 }, uSheetY: { value: .8 } } });
+    uTexel: { value: new THREE.Vector2() }, uForce: { value: 0 }, uAspect: { value: 1 }, uRadius: { value: .055 } } });
   const showMat = new THREE.ShaderMaterial({ vertexShader: V, fragmentShader: SHOW, uniforms: {
     uTrail: { value: null }, uText: { value: null }, uTexel: { value: new THREE.Vector2() }, uTime: { value: 0 },
     uC1: { value: new THREE.Vector3(.133, .902, 1) }, uC2: { value: new THREE.Vector3(.776, 1, .239) } } });
@@ -97,14 +90,12 @@ export function createLiquid(canvas) {
   addEventListener('pointermove', pm);
   function frame(now) {
     raf = requestAnimationFrame(frame);
-    const t = (now - t0) / 1000; let px, py, f, sheet = 0;
-    const U = simMat.uniforms;
-    // 처음: 글자 위쪽 전체에서 물을 쏟아 폭포처럼 모든 글자를 적신다
-    if (t < 2.4) { sheet = .5 * Math.sin(Math.PI * Math.min(1, t / 2.4)); px = -1; py = -1; f = 0 }
-    else if (now - lastMove > 2500) { px = .5 + .38 * Math.sin(t * .45); py = .8 + .05 * Math.sin(t * 1.3); f = .35 } // 가만히 있으면 위에서 계속 쏟아진다
-    else { px = mx; py = my; f = Math.max(force, .28); force *= .85 }  // 커서 = 수도꼭지
+    const t = (now - t0) / 1000; let px, py, f;
+    if (t < 1.8) { const p = t / 1.8; px = -.05 + 1.1 * p; py = .6 + .05 * Math.sin(p * 9); f = .55 }        // 처음: 글자 위로 쏟아 붓기
+    else if (now - lastMove > 2000) { px = .5 + .36 * Math.sin(t * .55); py = .5 + .14 * Math.sin(t * .9 + 1.3); f = .2 } // 가만히 있으면 혼자 흐른다
+    else { px = mx; py = my; f = force; force *= .85 }
     if (lx < 0 || Math.hypot(px - lx, py - ly) > .2) { lx = px; ly = py }
-    U.uLast.value.set(lx, ly); U.uMouse.value.set(px, py); U.uForce.value = f; U.uTime.value = t; U.uSheet.value = sheet; U.uSheetY.value = .8; lx = px; ly = py;
+    const U = simMat.uniforms; U.uLast.value.set(lx, ly); U.uMouse.value.set(px, py); U.uForce.value = f; lx = px; ly = py;
     U.uPrev.value = rtA.texture; quad.material = simMat; renderer.setRenderTarget(rtB); renderer.render(scene, cam);
     [rtA, rtB] = [rtB, rtA];
     showMat.uniforms.uTrail.value = rtA.texture; showMat.uniforms.uTime.value = t;

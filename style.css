@@ -117,7 +117,13 @@ html[lang=ko] .ph-title{font-family:var(--kr);letter-spacing:-.05em;line-height:
 .story .chip{position:absolute;left:50%;bottom:16px;transform:translateX(-50%);white-space:nowrap;padding:8px 14px;border-radius:99px;background:rgba(198,255,61,.16);border:1px solid rgba(198,255,61,.45);color:var(--lime);font:600 11px var(--mono);letter-spacing:.08em;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
 
 /* 4. 마지막 */
-#liq{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none}
+#liq,#worm{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none}
+#liq{z-index:1;transform-origin:50% 45%}
+#worm{opacity:0}
+.scrollcue{position:absolute;left:50%;bottom:7vh;transform:translateX(-50%);z-index:2;display:grid;justify-items:center;gap:12px;font:500 11px var(--mono);letter-spacing:.22em;text-transform:uppercase;color:var(--fg)}
+.scrollcue i{width:1px;height:52px;background:linear-gradient(var(--cyan),transparent);transform-origin:top;animation:cue 1.8s var(--ease) infinite}
+@keyframes cue{0%{transform:scaleY(0);opacity:1}55%{transform:scaleY(1);opacity:1}100%{transform:scaleY(1);opacity:0}}
+#finUi{visibility:hidden}
 .fin-hint{position:absolute;top:92px;left:0;right:0;text-align:center;font:500 11px var(--mono);letter-spacing:.2em;color:var(--dim);text-transform:uppercase;pointer-events:none}
 .fin-ui{position:absolute;left:0;right:0;bottom:8vh;display:flex;flex-direction:column;align-items:center;gap:18px;text-align:center;padding:0 20px;z-index:2}
 .fin-sub{color:var(--dim);font-size:16px}

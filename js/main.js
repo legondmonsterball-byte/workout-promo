@@ -1,6 +1,6 @@
 // 운동 기록 앱 홍보 사이트: E → 3D 플립북 → 핸드폰 속 앱 → Do you wanna try?
-import { sfx, music } from './sfx.js?v=1791358013';
-import { makeFrames } from './figure.js?v=1791358013';
+import { sfx, music } from './sfx.js?v=1791358723';
+import { makeFrames } from './figure.js?v=1791358723';
 
 const gsap = window.gsap;
 const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
@@ -29,6 +29,7 @@ const T = {
   finNote: { en: 'Open in Safari or Chrome → Add to Home Screen', ko: '사파리·크롬에서 열고 → 홈 화면에 추가' },
   finHint: { en: fine ? 'Move your cursor through the words' : 'Swipe across the words', ko: fine ? '글자 위로 마우스를 움직여 보세요' : '글자 위를 문질러 보세요' },
   replay: { en: '↺ Replay', ko: '↺ 처음부터' },
+  scrollIn: { en: fine ? 'Scroll to enter' : 'Swipe up to enter', ko: fine ? '스크롤해서 들어가기' : '위로 밀어서 들어가기' },
 };
 // 몇 번째 장이 보일 때 어떤 큰 글씨를 띄울지
 const CAPS = { 3: 'c1', 9: 'c2', 16: 'c3', 27: 'c4', 40: 'c5', 45: 'c6' };
@@ -62,7 +63,7 @@ const fontsReady = Promise.all([
   document.fonts.load('900 100px Archivo'), document.fonts.load('700 40px Caveat'),
   document.fonts.load('40px "Nanum Pen Script"', '눌러봐 기록'), document.fonts.load('900 40px "Pretendard Variable"', '기록'),
 ]).catch(() => { });
-const bookMod = fontsReady.then(() => import('./book.js?v=1791358013'));
+const bookMod = fontsReady.then(() => import('./book.js?v=1791358723'));
 bookMod.catch(() => { });
 
 // ───────── 1. 첫 화면 ─────────
@@ -254,13 +255,41 @@ async function toFinale() {
   tl.to('#story', { opacity: 0, y: '-=40', duration: .4 }, 0)
     .to('#device', { scale: .85, y: -40, opacity: 0, duration: .7, ease: 'power3.in' }, 0)
     .to('.ph-copy, .ph-steps, #bgword', { opacity: 0, y: -30, duration: .6, ease: 'power3.in', stagger: .05 }, 0);
-  const [mod] = await Promise.all([import('./liquid.js?v=1791358013'), tl.then()]);
+  const [mod] = await Promise.all([import('./liquid.js?v=1791358723'), tl.then()]);
   $('#phone').classList.remove('on'); stage = 'finale';
   $('#finale').classList.add('on');
   liquid = mod.createLiquid($('#liq'));
   gsap.from('#liq', { opacity: 0, duration: 1.2 });
-  gsap.from('.fin-ui > *, .fin-hint', { opacity: 0, y: 24, duration: .9, stagger: .12, delay: 1.4, ease: 'expo.out' });
+  gsap.from('.fin-hint, #cue', { opacity: 0, y: 24, duration: .9, stagger: .15, delay: 1.4, ease: 'expo.out' });
 }
+
+// ───────── 5. 스크롤 → 사각 웜홀 → 금 간 앱 로고 + 링크 ─────────
+let worm = null, wormLoading = false, wormP = 0;
+function travel(d) {
+  if (stage !== 'finale' || d <= 0) return;
+  if (worm) return worm.push(d);
+  if (wormLoading) return;
+  wormLoading = true; sfx.whoosh();
+  import('./wormhole.js?v=1791358723').then(m => m.createWormhole($('#worm'), { sfx, onProgress, onArrive })).then(w => { worm = w; worm.push(Math.max(d, .05)) });
+}
+function onProgress(p) {
+  wormP = p;
+  const liq = $('#liq'), k = Math.min(1, p / .22);
+  liq.style.opacity = 1 - k; liq.style.transform = `scale(${1 + k * 2.5})`;
+  $('#worm').style.opacity = Math.min(1, p / .08);
+  $('.fin-hint').style.opacity = $('#cue').style.opacity = 1 - Math.min(1, p / .05);
+  if (k >= 1 && liquid) { liquid.dispose(); liquid = null; liq.style.display = 'none' }
+}
+function onArrive() {
+  const ui = $('#finUi'); ui.style.visibility = 'visible';
+  gsap.fromTo('#finUi > *', { opacity: 0, y: 26 }, { opacity: 1, y: 0, duration: 1, stagger: .14, delay: .9, ease: 'expo.out' });
+}
+addEventListener('wheel', e => travel(e.deltaY * .0007), { passive: true });
+let touchY = null;
+addEventListener('touchstart', e => { touchY = e.touches[0].clientY }, { passive: true });
+addEventListener('touchmove', e => { if (touchY == null) return; const y = e.touches[0].clientY; travel((touchY - y) * .0016); touchY = y }, { passive: true });
+addEventListener('keydown', e => { if (['ArrowDown', 'PageDown', ' '].includes(e.key)) travel(.12) });
+$('#cue').addEventListener('click', () => travel(.12));
 $('#replay').addEventListener('click', () => location.reload());
 
 // ───────── 공통: 언어, 소리, 커서 ─────────
