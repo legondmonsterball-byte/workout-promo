@@ -10,11 +10,11 @@ export function makeFrames() {
   const F = [], P = 38, cyc = [0, .5, 1, .5];
   for (let i = 0; i < P; i++) {
     const ph = i % 4;
-    F.push({ mode: 'press', fit: smooth(2, 35, i), p: cyc[ph], dir: ph === 1 ? -1 : ph === 3 ? 1 : 0, effort: ph === 1 || ph === 2 ? 1 : 0, smile: 0, k: 0, day: Math.round(1 + 179 * Math.pow(i / (P - 1), 1.5)) })
+    F.push({ mode: 'press', fit: smooth(2, 35, i), p: cyc[ph], dir: ph === 1 ? -1 : ph === 3 ? 1 : 0, effort: ph === 1 || ph === 2 ? 1 : 0, smile: 0, k: 0, day: Math.round(1 + 171 * Math.pow(i / (P - 1), 1.5)) })
   }
   const fin = [{ mode: 'press', p: 0 }, { mode: 'lower' }, { mode: 'idle', floor: 1 }, { mode: 'idle', floor: 1, smile: .4 },
     { mode: 'phone', k: .35, floor: 1 }, { mode: 'phone', k: .7, floor: 1, smile: .4 }, { mode: 'phone', k: 1, floor: 1, smile: 1 }, { mode: 'phone', k: 1, floor: 1, smile: 1, note: 1 }];
-  for (const f of fin) F.push({ fit: 1, day: 180, p: 0, dir: 0, effort: 0, smile: 0, k: 0, ...f });
+  fin.forEach((f, k) => F.push({ fit: 1, day: 173 + k, p: 0, dir: 0, effort: 0, smile: 0, k: 0, ...f }));  // 마지막 느린 장들도 하루씩 넘어가 Day 180에서 멈춤
   F.forEach((f, i) => { f.page = i + 1; f.type = i % 3; f.prog = Math.min(1, i / (P - 1)); f.pr = i % 4 === 2 });
   return F;
 }
