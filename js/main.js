@@ -1,6 +1,6 @@
 // 운동 기록 앱 홍보 사이트: E → 3D 플립북 → 핸드폰 속 앱 → Do you wanna try?
-import { sfx, music } from './sfx.js?v=1791363016';
-import { makeFrames } from './figure.js?v=1791363016';
+import { sfx, music } from './sfx.js?v=1791364225';
+import { makeFrames } from './figure.js?v=1791364225';
 
 const gsap = window.gsap;
 const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
@@ -63,7 +63,7 @@ const fontsReady = Promise.all([
   document.fonts.load('900 100px Archivo'), document.fonts.load('700 40px Caveat'),
   document.fonts.load('40px "Nanum Pen Script"', '눌러봐 기록'), document.fonts.load('900 40px "Pretendard Variable"', '기록'),
 ]).catch(() => { });
-const bookMod = fontsReady.then(() => import('./book.js?v=1791363016'));
+const bookMod = fontsReady.then(() => import('./book.js?v=1791364225'));
 bookMod.catch(() => { });
 
 // ───────── 1. 첫 화면 ─────────
@@ -255,7 +255,7 @@ async function toFinale() {
   tl.to('#story', { opacity: 0, y: '-=40', duration: .4 }, 0)
     .to('#device', { scale: .85, y: -40, opacity: 0, duration: .7, ease: 'power3.in' }, 0)
     .to('.ph-copy, .ph-steps, #bgword', { opacity: 0, y: -30, duration: .6, ease: 'power3.in', stagger: .05 }, 0);
-  const [mod] = await Promise.all([import('./liquid.js?v=1791363016'), tl.then()]);
+  const [mod] = await Promise.all([import('./liquid.js?v=1791364225'), tl.then()]);
   $('#phone').classList.remove('on'); stage = 'finale';
   $('#finale').classList.add('on');
   liquid = mod.createLiquid($('#liq'));
@@ -270,7 +270,7 @@ function travel(d) {
   if (worm) return worm.push(d);
   if (wormLoading) return;
   wormLoading = true; sfx.whoosh();
-  import('./wormhole.js?v=1791363016').then(m => m.createWormhole($('#worm'), { sfx, onProgress, onArrive })).then(w => { worm = w; worm.push(Math.max(d, .05)) });
+  import('./wormhole.js?v=1791364225').then(m => m.createWormhole($('#worm'), { sfx, onProgress, onArrive })).then(w => { worm = w; worm.push(Math.max(d, .05)) });
 }
 function onProgress(p) {
   wormP = p;
@@ -290,7 +290,7 @@ addEventListener('touchstart', e => { touchY = e.touches[0].clientY }, { passive
 addEventListener('touchmove', e => { if (touchY == null) return; const y = e.touches[0].clientY; travel((touchY - y) * .0016); touchY = y }, { passive: true });
 addEventListener('keydown', e => { if (['ArrowDown', 'PageDown', ' '].includes(e.key)) travel(.12) });
 $('#cue').addEventListener('click', () => travel(.12));
-$('#replay').addEventListener('click', () => location.reload());
+$('#replay').addEventListener('click', () => { location.href = location.pathname });  // 주소의 #stage=... 를 지우고 처음부터
 
 // ───────── 공통: 언어, 소리, 커서 ─────────
 $('#lang').addEventListener('click', () => { lang = lang === 'ko' ? 'en' : 'ko'; try { localStorage.setItem('lang', lang) } catch (e) { } applyLang(); sfx.tick() });
@@ -310,6 +310,7 @@ fontsReady.then(intro);
 
 // 테스트용: 주소 끝에 #stage=book|phone|finale 이면 바로 그 장면으로
 const jump = location.hash.match(/stage=(\w+)/);
+if (jump) history.replaceState(null, '', location.pathname);  // 새로고침하면 처음부터
 if (jump) fontsReady.then(async () => {
   introDone = true; const t = jump[1];
   if (t === 'book') return go();

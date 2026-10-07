@@ -1,6 +1,6 @@
 // 3D 두꺼운 스케치북: 페이지가 넘어가며 그림이 바뀌는 플립북 (Three.js)
 import * as THREE from 'three';
-import { CW, CH, drawFigure, drawLog, drawCover } from './figure.js?v=1791363016';
+import { CW, CH, drawFigure, drawLog, drawCover } from './figure.js?v=1791364225';
 
 const PWU = 1, PHU = CH / CW, SEG = 28, TT = .12, CT = .03;
 const clamp = (x, a, b) => Math.max(a, Math.min(b, x)), lerp = (a, b, t) => a + (b - a) * t;
