@@ -12,5 +12,5 @@
 - 책 넘김 속도: js/book.js의 interval / SLOW
 - 배경 비트: js/sfx.js의 music (100BPM 긴장감: 심장박동 킥·조여오는 베이스·초침·반음 패드, 첫 클릭/키 입력 때 시작, ♪ 버튼으로 끔)
 - 마지막 액체 효과: js/liquid.js (처음 버전 + 점성만 낮춤: sp 속도, here*.955 붙어있는 정도). 글자는 액체가 지금 있는 곳만 색, 없으면 회색 (사용자 요청)
-- 그 다음: 스크롤 → js/wormhole.js 사각 웜홀 → 금 간 앱 로고(logo.svg = 앱 아이콘, 마우스 빠르게 움직이면 조각이 흩날렸다 돌아옴) + 아래 링크. 이글루(igloo.inc) 마지막 장면 참고
+- 그 다음: 스크롤 → js/wormhole.js 사각 웜홀 → 금 간 앱 로고(logo.svg = 앱 아이콘을 보로노이로 깨서 두께 있는 유리 조각으로 만듦 + 스프링 물리 + 빛번짐(bloom). 밝기는 wormhole.js의 조명·bloom·NeutralToneMapping으로 조절) + 아래 링크. 이글루(igloo.inc) 마지막 장면 참고
 - 배포할 때 index.html·js의 ?v=숫자를 새로 바꿔야 브라우저가 새 파일을 받는다
