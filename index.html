@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>ONE SET A DAY — just write it down</title>
+<meta name="description" content="A free workout log. Record every set, get a simple recap of your day, and share it like a run.">
+<meta name="theme-color" content="#07090b">
+<meta property="og:title" content="ONE SET A DAY">
+<meta property="og:description" content="Record every set. No paid AI coach — just today, summed up. Share it like a run.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='14' fill='%2307090b'/><text x='32' y='46' font-family='Arial Black,Arial' font-weight='900' font-size='40' text-anchor='middle' fill='%2322e6ff'>E</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Caveat:wght@500;700&family=Nanum+Pen+Script&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="style.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js"}}</script>
+<script type="module" src="js/main.js"></script>
+</head>
+<body>
+<div class="grain" aria-hidden="true"></div>
+<div class="cursor" id="cursor" aria-hidden="true"></div>
+
+<header class="top">
+  <a class="brand" href="./">ONE SET A DAY<span>오늘도 한 세트</span></a>
+  <nav>
+    <button class="pill" id="snd">SOUND ON</button>
+    <button class="pill" id="lang">EN / KO</button>
+    <a class="pill acc" id="openApp" href="https://legondmonsterball-byte.github.io/workout-app/" target="_blank" rel="noopener" data-t="openApp">Open app ↗</a>
+  </nav>
+</header>
+
+<main>
+  <!-- 1. 첫 화면: EXERCISE의 E를 누르면 시작 -->
+  <section id="hero" class="stage on">
+    <p class="lede" data-t="lede"></p>
+    <div class="word-wrap">
+      <h1 class="word" id="word" aria-label="EXERCISE"><span class="ch ekey" data-e style="--wg:860;--wd:100;--fill:0%">E</span><span class="ch" style="--wg:860;--wd:100">X</span><span class="ch" data-e style="--wg:860;--wd:100">E</span><span class="ch" style="--wg:860;--wd:100">R</span><span class="ch" style="--wg:860;--wd:100">C</span><span class="ch" style="--wg:860;--wd:100">I</span><span class="ch" style="--wg:860;--wd:100">S</span><span class="ch" data-e style="--wg:860;--wd:100">E</span></h1>
+      <div class="hint" id="hint"><kbd>E</kbd><span data-t="pressE"></span></div>
+    </div>
+    <svg class="badge" viewBox="0 0 200 200" aria-hidden="true">
+      <defs><path id="circ" d="M100,100 m-80,0 a80,80 0 1,1 160,0 a80,80 0 1,1 -160,0"/></defs>
+      <text><textPath href="#circ">NO PAID AI COACH ✶ FREE ✶ NO SIGN-UP ✶ </textPath></text>
+      <text class="c0" x="100" y="116" text-anchor="middle">₩0</text>
+    </svg>
+    <div class="marq m1" aria-hidden="true"><div class="track"><span>RECORD ✶ REVIEW ✶ SHARE ✶ REPEAT ✶ RECORD ✶ REVIEW ✶ SHARE ✶ REPEAT ✶&nbsp;</span><span>RECORD ✶ REVIEW ✶ SHARE ✶ REPEAT ✶ RECORD ✶ REVIEW ✶ SHARE ✶ REPEAT ✶&nbsp;</span></div></div>
+    <div class="marq m2" aria-hidden="true"><div class="track rev"><span>기록하고 ✶ 정리하고 ✶ 공유하고 ✶ 또 하고 ✶ 기록하고 ✶ 정리하고 ✶ 공유하고 ✶ 또 하고 ✶&nbsp;</span><span>기록하고 ✶ 정리하고 ✶ 공유하고 ✶ 또 하고 ✶ 기록하고 ✶ 정리하고 ✶ 공유하고 ✶ 또 하고 ✶&nbsp;</span></div></div>
+    <p class="meta" data-t="meta"></p>
+  </section>
+
+  <!-- 2. 3D 스케치북 플립북 -->
+  <section id="book" class="stage">
+    <canvas id="bookc"></canvas>
+    <div class="hud tl"><div class="hud-l">DAY</div><div class="hud-n" id="dayN">001</div></div>
+    <div class="hud tr">
+      <div class="stat"><i data-t="sets"></i><b id="setsN">0</b></div>
+      <div class="stat"><i data-t="body"></i><b id="kgN">96.0kg</b></div>
+    </div>
+    <div class="cap" id="cap"></div>
+    <button class="hot" id="hot" aria-label="Open the phone"><i></i><i></i></button>
+    <button class="pill skip" id="skip" data-t="skip"></button>
+  </section>
+
+  <!-- 3. 핸드폰 속 앱 화면 -->
+  <section id="phone" class="stage">
+    <div class="bgword" id="bgword" aria-hidden="true"><span id="bgTrack"></span></div>
+    <div class="ph-copy">
+      <div class="ph-num" id="phNum"></div>
+      <div class="ph-kicker" id="phKick"></div>
+      <h2 class="ph-title" id="phTitle"></h2>
+      <p class="ph-body" id="phBody"></p>
+      <div class="ph-nav"><button class="pill" id="prev" aria-label="previous">←</button><button class="pill" id="next" aria-label="next">→</button><span class="ph-tip" data-t="tapHint"></span></div>
+    </div>
+    <div class="device" id="device">
+      <div class="screen">
+        <img src="shots/01-today.jpg" alt="Today's routine screen">
+        <img src="shots/02-active.jpg" alt="Recording sets screen">
+        <img src="shots/03-log.jpg" alt="Daily recap screen">
+        <img src="shots/05-share.jpg" alt="Share card screen">
+      </div>
+      <div class="island"></div>
+      <div class="bars"><i><b></b></i><i><b></b></i><i><b></b></i><i><b></b></i></div>
+    </div>
+    <ol class="ph-steps"><li><span>01</span>PLAN</li><li><span>02</span>RECORD</li><li><span>03</span>REVIEW</li><li><span>04</span>SHARE</li></ol>
+    <div class="story" id="story"><img src="shots/card.jpg" alt="Workout share card"><span class="chip" data-t="posted"></span></div>
+  </section>
+
+  <!-- 4. 마지막: Do you wanna try? -->
+  <section id="finale" class="stage">
+    <canvas id="liq"></canvas>
+    <h2 class="sr">Do you wanna try?</h2>
+    <p class="fin-hint" data-t="finHint"></p>
+    <div class="fin-ui">
+      <p class="fin-sub" data-t="finSub"></p>
+      <a class="cta" href="https://legondmonsterball-byte.github.io/workout-app/" target="_blank" rel="noopener" data-t="cta"></a>
+      <p class="fin-note" data-t="finNote"></p>
+    </div>
+    <button class="pill replay" id="replay" data-t="replay"></button>
+  </section>
+</main>
+<div class="flash" id="flash" aria-hidden="true"></div>
+</body>
+</html>
