@@ -1,6 +1,6 @@
 // 운동 기록 앱 홍보 사이트: E → 3D 플립북 → 핸드폰 속 앱 → Do you wanna try?
-import { sfx, music } from './sfx.js';
-import { makeFrames } from './figure.js';
+import { sfx, music } from './sfx.js?v=1791357913';
+import { makeFrames } from './figure.js?v=1791357913';
 
 const gsap = window.gsap;
 const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
@@ -62,7 +62,7 @@ const fontsReady = Promise.all([
   document.fonts.load('900 100px Archivo'), document.fonts.load('700 40px Caveat'),
   document.fonts.load('40px "Nanum Pen Script"', '눌러봐 기록'), document.fonts.load('900 40px "Pretendard Variable"', '기록'),
 ]).catch(() => { });
-const bookMod = fontsReady.then(() => import('./book.js'));
+const bookMod = fontsReady.then(() => import('./book.js?v=1791357913'));
 bookMod.catch(() => { });
 
 // ───────── 1. 첫 화면 ─────────
@@ -107,7 +107,7 @@ addEventListener('pointermove', e => { pointer = e });
 $$('[data-e]').forEach(el => el.addEventListener('click', go));
 addEventListener('keydown', e => {
   if (e.metaKey || e.ctrlKey || e.altKey) return;
-  if (stage === 'hero' && e.key.toLowerCase() === 'e') go();
+  if (stage === 'hero' && (e.code === 'KeyE' || /^[eㄷ]$/i.test(e.key))) go();  // 한글 입력 상태(ㄷ)여도 된다
   if (stage === 'phone') { if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); goStep(step + 1) } if (e.key === 'ArrowLeft') goStep(step - 1) }
 });
 
@@ -250,7 +250,7 @@ async function toFinale() {
   tl.to('#story', { opacity: 0, y: '-=40', duration: .4 }, 0)
     .to('#device', { scale: .85, y: -40, opacity: 0, duration: .7, ease: 'power3.in' }, 0)
     .to('.ph-copy, .ph-steps, #bgword', { opacity: 0, y: -30, duration: .6, ease: 'power3.in', stagger: .05 }, 0);
-  const [mod] = await Promise.all([import('./liquid.js'), tl.then()]);
+  const [mod] = await Promise.all([import('./liquid.js?v=1791357913'), tl.then()]);
   $('#phone').classList.remove('on'); stage = 'finale';
   $('#finale').classList.add('on');
   liquid = mod.createLiquid($('#liq'));

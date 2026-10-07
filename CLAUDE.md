@@ -12,3 +12,4 @@
 - 책 넘김 속도: js/book.js의 interval / SLOW
 - 배경 비트: js/sfx.js의 music (92BPM 킥·베이스·패드 합성, 첫 클릭/키 입력 때 시작, ♪ 버튼으로 끔)
 - 마지막 물 효과: js/liquid.js SIM(떨어지는 속도 sp, 젖음 유지 .994), SHOW(색·반짝임)
+- 배포할 때 index.html·js의 ?v=숫자를 새로 바꿔야 브라우저가 새 파일을 받는다
