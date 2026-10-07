@@ -1,5 +1,5 @@
 // 운동 기록 앱 홍보 사이트: E → 3D 플립북 → 핸드폰 속 앱 → Do you wanna try?
-import { sfx } from './sfx.js';
+import { sfx, music } from './sfx.js';
 import { makeFrames } from './figure.js';
 
 const gsap = window.gsap;
@@ -33,7 +33,7 @@ const T = {
 // 몇 번째 장이 보일 때 어떤 큰 글씨를 띄울지
 const CAPS = { 3: 'c1', 9: 'c2', 16: 'c3', 27: 'c4', 40: 'c5', 45: 'c6' };
 const STEPS = [
-  { kick: 'PLAN', title: { en: 'Open it.<br>Today’s plan is ready.', ko: '열면,<br>오늘 루틴이 준비돼 있어요.' },
+  { kick: 'PLAN', title: { en: 'Open it.<br>Plan’s ready.', ko: '열면,<br>오늘 루틴 준비 끝.' },
     body: { en: 'It picks the part you’ve skipped the longest. No thinking before lifting.', ko: '가장 오래 쉰 부위를 알아서 골라줘요. 고민 없이 바로 시작.' } },
   { kick: 'RECORD', title: { en: 'Record<br>every set.', ko: '세트마다,<br>기록.' }, focus: { x: .5, y: .36, s: 1.5 },
     body: { en: 'Weight × reps in one tap. It remembers last time and tells you: one more rep, or +2.5kg. Rest timer starts by itself.', ko: '무게 × 횟수를 한 번에. 지난번 기록을 기억해서 “1회 더”, “+2.5kg”을 알려줘요. 휴식 타이머는 자동.' } },
@@ -113,14 +113,20 @@ addEventListener('keydown', e => {
 
 async function go() {
   if (stage !== 'hero' || !introDone) return;
-  stage = 'toBook'; sfx.unlock(); sfx.whoosh();
+  stage = 'toBook'; startAudio(); sfx.charge();
   const e = chars[0], others = chars.slice(1);
   gsap.killTweensOf(chars); $('#word').style.overflow = 'visible';
+  e.style.setProperty('--wg', 900); e.style.setProperty('--wd', 100);
+  gsap.set(e, { transformOrigin: '20% 55%' });
+  // E 안이 아래부터 차오르며 꽉 채워지고 → 그대로 화면을 덮을 만큼 커진다
+  const fill = { v: parseFloat(e.style.getPropertyValue('--fill')) || 0 };
   const tl = gsap.timeline();
   tl.to('.lede, .hint, .badge, .marq, .meta', { opacity: 0, duration: .35 }, 0)
     .to(others, { y: () => innerHeight * gsap.utils.random(.6, 1.1), x: () => gsap.utils.random(-80, 80), rotation: () => gsap.utils.random(-80, 80), opacity: 0, duration: 1, ease: 'power3.in', stagger: { each: .04, from: 'end' } }, 0)
-    .to(e, { '--fill': '100%', '--wg': 900, '--wd': 100, duration: .5, ease: 'power2.in' }, 0)
-    .to(e, { scale: 90, duration: 1.1, ease: 'expo.in', transformOrigin: '20% 55%' }, .45);
+    .to(fill, { v: 100, duration: .8, ease: 'power2.inOut', onUpdate: () => e.style.setProperty('--fill', fill.v + '%') }, 0)
+    .to(e, { scale: 1.12, duration: .8, ease: 'power2.out' }, 0)
+    .add(() => { e.style.color = 'var(--cyan)'; e.style.background = 'none'; sfx.whoosh() }, .8)
+    .to(e, { scale: 90, duration: 1.1, ease: 'expo.in' }, .85);
   const [mod] = await Promise.all([bookMod, tl.then()]);
   showBook(mod);
 }
@@ -255,7 +261,10 @@ $('#replay').addEventListener('click', () => location.reload());
 
 // ───────── 공통: 언어, 소리, 커서 ─────────
 $('#lang').addEventListener('click', () => { lang = lang === 'ko' ? 'en' : 'ko'; try { localStorage.setItem('lang', lang) } catch (e) { } applyLang(); sfx.tick() });
-$('#snd').addEventListener('click', () => { sfx.on = !sfx.on; $('#snd').textContent = sfx.on ? 'SOUND ON' : 'SOUND OFF'; $('#snd').classList.toggle('off', !sfx.on) });
+$('#snd').addEventListener('click', e => { e.stopPropagation(); startAudio(); sfx.on = !sfx.on; $('#snd').textContent = sfx.on ? '♪ ON' : '♪ OFF'; $('#snd').classList.toggle('off', !sfx.on) });
+// 배경 비트: 브라우저 규칙상 첫 클릭·키 입력 때 시작된다
+function startAudio() { sfx.unlock(); music.start() }
+addEventListener('pointerdown', startAudio, { once: true }); addEventListener('keydown', startAudio, { once: true });
 if (fine) {
   const cur = $('#cursor'), qx = gsap.quickTo(cur, 'x', { duration: .25, ease: 'power3' }), qy = gsap.quickTo(cur, 'y', { duration: .25, ease: 'power3' });
   addEventListener('pointermove', e => { qx(e.clientX); qy(e.clientY); cur.style.opacity = 1 });

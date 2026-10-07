@@ -10,3 +10,5 @@
 - 테스트: 주소 끝에 #stage=book / #stage=phone / #stage=finale 로 바로 이동
 - 문구 수정: js/main.js 맨 위 T(공통 문구), STEPS(앱 화면 설명), CAPS(책 넘길 때 큰 글씨)
 - 책 넘김 속도: js/book.js의 interval / SLOW
+- 배경 비트: js/sfx.js의 music (92BPM 킥·베이스·패드 합성, 첫 클릭/키 입력 때 시작, ♪ 버튼으로 끔)
+- 마지막 물 효과: js/liquid.js SIM(떨어지는 속도 sp, 젖음 유지 .994), SHOW(색·반짝임)

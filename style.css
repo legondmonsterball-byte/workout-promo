@@ -87,14 +87,14 @@ html[lang=ko] .cline{font-family:var(--kr);letter-spacing:-.05em}
 #phone{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:5vw;padding:90px 5vw 40px}
 .bgword{position:absolute;top:50%;left:0;white-space:nowrap;transform:translateY(-50%);pointer-events:none}
 .bgword span{display:inline-block;font-family:var(--disp);font-weight:900;font-variation-settings:"wdth" 125;font-size:26vw;line-height:.8;color:transparent;-webkit-text-stroke:1px rgba(255,255,255,.07);animation:mq 40s linear infinite}
-.ph-copy{position:relative;z-index:2;max-width:470px;justify-self:end}
+.ph-copy{position:relative;z-index:2;width:min(500px,100%);justify-self:end}
 .ph-num{font-family:var(--disp);font-weight:900;font-variation-settings:"wdth" 120;font-size:clamp(72px,10vw,170px);line-height:.82;height:.84em;overflow:hidden;color:transparent;-webkit-text-stroke:1.5px var(--lime)}
 .ph-num span{display:inline-block}
 .ph-kicker{font:600 12px var(--mono);letter-spacing:.26em;color:var(--cyan);margin:22px 0 12px}
-.ph-title{font-family:var(--disp);font-weight:900;font-variation-settings:"wdth" 108;font-size:clamp(30px,3.5vw,56px);line-height:1;letter-spacing:-.03em}
-html[lang=ko] .ph-title{font-family:var(--kr);letter-spacing:-.05em;line-height:1.15}
+.ph-title{font-family:var(--disp);font-weight:900;font-variation-settings:"wdth" 108;font-size:clamp(30px,3.3vw,52px);line-height:1;letter-spacing:-.03em;min-height:3.05em}
+html[lang=ko] .ph-title{font-family:var(--kr);letter-spacing:-.05em;line-height:1.15;min-height:3.45em}
 .ph-title .tl{display:block}
-.ph-body{margin-top:18px;color:var(--dim);font-size:16px;line-height:1.65;max-width:400px}
+.ph-body{margin-top:18px;color:var(--dim);font-size:16px;line-height:1.65;max-width:420px;min-height:5em}
 .ph-nav{margin-top:28px;display:flex;align-items:center;gap:8px}
 .ph-nav .pill{width:42px;height:42px;padding:0;font-size:16px}
 .ph-tip{margin-left:8px;font:500 11px var(--mono);letter-spacing:.12em;color:var(--dim);text-transform:uppercase}
@@ -134,7 +134,6 @@ html[lang=ko] .cta{font-family:var(--kr)}
 @media (max-width:860px){
   .top{padding:14px 16px}
   .top nav{gap:6px}.pill{padding:8px 11px;font-size:10px}
-  #snd{display:none}
   .lede{top:76px;left:16px;right:16px;font-size:14px}
   .meta{left:16px;bottom:18px}
   .badge{right:16px;top:auto;bottom:30vh;width:92px;height:92px}
@@ -149,8 +148,8 @@ html[lang=ko] .cta{font-family:var(--kr)}
   .ph-copy{order:2;justify-self:stretch;max-width:none}
   .ph-num{font-size:52px;display:inline-block;vertical-align:bottom;margin-right:12px}
   .ph-kicker{display:inline-block;margin:0 0 6px}
-  .ph-title{font-size:27px;margin-top:6px}
-  .ph-body{font-size:14px;margin-top:10px;line-height:1.55}
+  .ph-title,html[lang=ko] .ph-title{font-size:27px;margin-top:6px;min-height:2.3em}
+  .ph-body{font-size:14px;margin-top:10px;line-height:1.55;min-height:4.7em}
   .ph-nav{margin-top:14px}
   .ph-steps{display:none}
   .replay{left:16px;bottom:16px}
